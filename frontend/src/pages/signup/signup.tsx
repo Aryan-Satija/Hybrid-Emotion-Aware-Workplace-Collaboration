@@ -1,4 +1,5 @@
 import React, { useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 import {
   Layout,
   Form,
@@ -24,7 +25,9 @@ const { Content } = Layout
 
 export function Signup() {
   const [loading, setLoading] = useState(false)
+  const [messageApi, contextHolder] = message.useMessage()
   const { token } = theme.useToken()
+  const navigate = useNavigate()
 
   interface SignupValues {
     companyName: string
@@ -38,11 +41,34 @@ export function Signup() {
   const onFinish = async (values: SignupValues) => {
     setLoading(true)
     try {
-      await new Promise((res) => setTimeout(res, 1000))
-      message.success(`Welcome, ${values.companyName}!`)
-      console.log('Form data:', values)
-    } catch {
-      message.error('Signup failed')
+      const formData = new FormData()
+      formData.append("name", values.companyName)
+      if (values.domain) formData.append("domain", values.domain)
+      if (values.industry) formData.append("industry", values.industry)
+      if (values.location) formData.append("location", values.location)
+      if (values.state) formData.append("state", values.state)
+      if (values.logo && values.logo[0]) {
+        formData.append("logo", values.logo[0].originFileObj) 
+      }
+
+      const response = await fetch(
+        "http://127.0.0.1:8000/api/core/companies/",
+        {
+          method: "POST",
+          body: formData,
+        }
+      )
+
+      if (!response.ok) {
+        throw new Error("Failed to register company")
+      }
+
+      const data = await response.json()
+      messageApi.success(`Welcome, ${data.companyName || values.companyName}! 🎉`)
+      navigate(`/register/companies/${data.id}/admin/`)
+    } catch (error) {
+      console.error(error)
+      messageApi.error("Something went wrong!")
     } finally {
       setLoading(false)
     }
@@ -50,6 +76,7 @@ export function Signup() {
 
   return (
     <Layout style={{ minHeight: '100vh', padding: '10px' }}>
+      {contextHolder}
       <Content
         style={{
           flex: 1,
@@ -165,7 +192,7 @@ export function Signup() {
                 loading={loading}
                 icon={<UserAddOutlined />}
               >
-                Sign Up
+                Register
               </Button>
             </Form.Item>
           </Form>
