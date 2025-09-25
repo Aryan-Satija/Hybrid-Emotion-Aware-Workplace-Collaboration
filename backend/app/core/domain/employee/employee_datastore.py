@@ -1,7 +1,7 @@
 from ...models.company import Company
 from ...models.employee import Employee
 from .beans_factory import EmployeeBeanFactory
-
+from ...utils.auth import compare_passwords
 
 class EmployeeDataStore:
     @staticmethod
@@ -13,6 +13,15 @@ class EmployeeDataStore:
     @staticmethod
     def get_employee(employee_id):
         employee = Employee.objects.get(id=employee_id)
+        return EmployeeBeanFactory.from_model(employee)
+
+    @staticmethod
+    def verify_employee(email_id, password):
+        employee = Employee.objects.get(email=email_id)
+        
+        if not compare_passwords(password, employee.password):
+            raise ValueError("Invalid email or password") 
+            
         return EmployeeBeanFactory.from_model(employee)
 
     @staticmethod

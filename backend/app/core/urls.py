@@ -1,6 +1,7 @@
 from django.urls import path
 from .viewsets.employee import Employee
 from .viewsets.company import Company
+from .viewsets.auth import Login
 
 employee_list = Employee.as_view({"get": "list", "post": "create"})
 employee_detail = Employee.as_view(
@@ -18,6 +19,7 @@ urlpatterns = [
         employee_detail,
         name="employee-detail",
     ),
+    path("auth/login/", Login.as_view({"post": "login"})),
     path("companies/", company_list, name="company-list"),
     path("companies/<str:company_id>/", company_detail, name="company-detail"),
 ]
