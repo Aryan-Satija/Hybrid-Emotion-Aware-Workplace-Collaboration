@@ -65,7 +65,7 @@ export function Signup() {
 
       const data = await response.json()
       messageApi.success(`Welcome, ${data.companyName || values.companyName}! 🎉`)
-      navigate(`/register/companies/${data.id}/admin/`)
+      navigate(`/admin/companies/${data.id}/register`)
     } catch (error) {
       console.error(error)
       messageApi.error("Something went wrong!")

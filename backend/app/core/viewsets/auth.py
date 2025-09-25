@@ -17,13 +17,14 @@ class Login(ViewSet):
             employee = EmployeeDataStore.verify_employee(email, password)
             token = create_access_token(employee.id)
             return Response({
-                "access_token": token,
+                "token": token,
                 "employee": {
                     "id": employee.id,
                     "first_name": employee.first_name,
                     "last_name": employee.last_name,
                     "email": employee.email,
                     "role": employee.role,
+                    "company_id": employee.company_id
                 }
             }, status=HTTP_200_OK)
         except Exception as e:

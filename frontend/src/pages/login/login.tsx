@@ -41,7 +41,7 @@ export function Login() {
 
       const data = await response.json();
       if (data.token) {
-        localStorage.setItem("authToken", data.token);
+        localStorage.setItem("token", data.token);
       }
       if(data.employee){
         localStorage.setItem("employee", JSON.stringify(data.employee))

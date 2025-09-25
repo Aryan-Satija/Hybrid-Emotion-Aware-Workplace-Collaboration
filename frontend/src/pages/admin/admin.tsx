@@ -39,7 +39,7 @@ export function CreateAdmin() {
     try {
       const payload = {
         ...values,
-        role: values.role || 'Admin',
+        role: values.role || 'admin',
       }
 
       const res = await fetch(`http://127.0.0.1:8000/api/core/companies/${companyId}/employees/`, {
