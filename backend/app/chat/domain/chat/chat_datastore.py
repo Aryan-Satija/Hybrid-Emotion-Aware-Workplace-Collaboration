@@ -5,6 +5,7 @@ from core.models.employee import Employee
 from .bean_factory import ChatBeanFactory
 from .beans import ChatBean
 from mongoengine.queryset.visitor import Q
+import text2emotion as te
 
 class ChatDatastore:
 
@@ -12,7 +13,8 @@ class ChatDatastore:
     def create_chat(from_user_id: str, to_user_id: str, text: str) -> ChatBean:
         from_user = Employee.objects.get(id=from_user_id)
         to_user = Employee.objects.get(id=to_user_id)
-        chat = Chat(from_user=from_user, to_user=to_user, text=text)
+        emotion_score = te.get_emotion(text)
+        chat = Chat(from_user=from_user, to_user=to_user, text=text, emotions=emotion_score)
         chat.save()
         return ChatBeanFactory.from_model(chat)
 

@@ -7,8 +7,10 @@ import {
   List,
   Typography,
   Space,
+  notification,
+  Tooltip
 } from "antd";
-import { UserOutlined, SendOutlined } from "@ant-design/icons";
+import { UserOutlined, ThunderboltOutlined, SendOutlined } from "@ant-design/icons";
 
 const { Content, Header, Footer } = Layout;
 const { Text } = Typography;
@@ -26,9 +28,7 @@ interface ChatBoxProps {
 }
 
 export const ChatBox: React.FC<ChatBoxProps> = ({ recipient }) => {
-  const employee: Employee = JSON.parse(
-    localStorage.getItem("employee") ?? ""
-  );
+  const employee: Employee = JSON.parse(localStorage.getItem("employee") ?? "");
   const token = localStorage.getItem("token");
 
   const [messages, setMessages] = useState<
@@ -41,6 +41,8 @@ export const ChatBox: React.FC<ChatBoxProps> = ({ recipient }) => {
   >([]);
 
   const [inputValue, setInputValue] = useState("");
+  const [force, setForce] = useState(false);
+  const [api, contextHolder] = notification.useNotification();
   const ws = useRef<WebSocket | null>(null);
   const messagesEndRef = useRef<HTMLDivElement | null>(null);
 
@@ -68,8 +70,7 @@ export const ChatBox: React.FC<ChatBoxProps> = ({ recipient }) => {
       const mappedMessages = data
         .sort(
           (a: any, b: any) =>
-            new Date(a.created_at).getTime() -
-            new Date(b.created_at).getTime()
+            new Date(a.created_at).getTime() - new Date(b.created_at).getTime()
         )
         .map((chat: any) => ({
           from_user: chat.from_user,
@@ -109,6 +110,16 @@ export const ChatBox: React.FC<ChatBoxProps> = ({ recipient }) => {
 
     socket.onmessage = (event) => {
       const data = JSON.parse(event.data);
+      const msg = data.message;
+      if (msg.from_user === "system") {
+        api.info({
+          message: "System Message",
+          description: msg.message,
+          placement: "topRight",
+          duration: 4,
+        });
+        return;
+      }
       setMessages((prev) => [...prev, data.message]);
     };
 
@@ -118,7 +129,6 @@ export const ChatBox: React.FC<ChatBoxProps> = ({ recipient }) => {
   }, [recipient?.id, employee.id]);
 
   useEffect(() => {
-    // auto-scroll to latest message
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
 
@@ -130,6 +140,7 @@ export const ChatBox: React.FC<ChatBoxProps> = ({ recipient }) => {
         from_user_id: employee?.id,
         to_user_id: recipient?.id,
         message: inputValue,
+        force: force
       })
     );
 
@@ -138,6 +149,7 @@ export const ChatBox: React.FC<ChatBoxProps> = ({ recipient }) => {
 
   return (
     <Layout style={{ height: "98vh", background: "#f5f6fa" }}>
+      {contextHolder}
       <Header
         style={{
           background: "#fff",
@@ -221,12 +233,24 @@ export const ChatBox: React.FC<ChatBoxProps> = ({ recipient }) => {
           onChange={(e) => setInputValue(e.target.value)}
           onPressEnter={handleSend}
           suffix={
-            <Button
-              type="primary"
-              shape="circle"
-              icon={<SendOutlined />}
-              onClick={handleSend}
-            />
+            <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+              <Tooltip title="Force Send">
+                <ThunderboltOutlined
+                  style={{
+                    color: force ? "#faad14" : "#999",
+                    fontSize: 18,
+                    cursor: "pointer",
+                  }}
+                  onClick={() => setForce((prev) => !prev)}
+                />
+              </Tooltip>
+              <Button
+                type="primary"
+                shape="circle"
+                icon={<SendOutlined />}
+                onClick={handleSend}
+              />
+            </div>
           }
         />
       </Footer>

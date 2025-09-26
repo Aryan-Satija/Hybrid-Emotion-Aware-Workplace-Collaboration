@@ -1,6 +1,10 @@
 import json
+import random
 from channels.generic.websocket import AsyncWebsocketConsumer
 from .domain.chat.chat_datastore import ChatDatastore
+from .constants import CONSOLING_MESSAGES
+import text2emotion as te
+from datetime import datetime, timezone
 
 
 class ChatConsumer(AsyncWebsocketConsumer):
@@ -19,21 +23,36 @@ class ChatConsumer(AsyncWebsocketConsumer):
         message = data.get("message")
         to_user_id = data.get("to_user_id")
         from_user_id = data.get("from_user_id")
-        print("====================")
-        print(data)
-        print(message)
-        print(from_user_id)
-        print(to_user_id)
-        print("====================")
-        chat = ChatDatastore.create_chat(from_user_id, to_user_id, message)
+        force = data.get("force", False)
         
+        emotion_score = te.get_emotion(message) 
+        anger = emotion_score.get("Angry", 0) 
+
+        if not force and anger > 0.7:
+            await self.send(
+                text_data=json.dumps({
+                    "message": {
+                        "from_user": "system",
+                        "to_user": from_user_id,
+                        "message": random.choice(CONSOLING_MESSAGES),
+                        "created_at": datetime.now(timezone.utc).isoformat(),
+                    }
+                })
+            )
+            return
+
+        chat = ChatDatastore.create_chat(from_user_id, to_user_id, message)
         await self.channel_layer.group_send(
-            self.room_group_name, {"type": "chat_message", "message": {
-                "from_user": chat.from_user_id,
-                "to_user": chat.to_user_id,
-                "message": chat.text,
-                "created_at": str(chat.created_at)
-            }}
+            self.room_group_name,
+            {
+                "type": "chat_message",
+                "message": {
+                    "from_user": chat.from_user_id,
+                    "to_user": chat.to_user_id,
+                    "message": chat.text,
+                    "created_at": str(chat.created_at),
+                },
+            },
         )
 
     async def chat_message(self, event):

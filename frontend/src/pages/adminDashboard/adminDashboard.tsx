@@ -1,6 +1,26 @@
 import { useState, useEffect } from "react";
-import { Card, Layout, List, Tag, Button, message, Form, Input, Select, Space, Tooltip, Divider, Upload } from "antd";
-import { EditOutlined, DeleteOutlined, MessageOutlined, UploadOutlined } from "@ant-design/icons";
+import {
+  Card,
+  Layout,
+  List,
+  Tag,
+  Button,
+  message,
+  Form,
+  Input,
+  Select,
+  Space,
+  Tooltip,
+  Divider,
+  Upload,
+} from "antd";
+import {
+  EditOutlined,
+  DeleteOutlined,
+  MessageOutlined,
+  UploadOutlined,
+  LogoutOutlined,
+} from "@ant-design/icons";
 
 const { Sider, Content } = Layout;
 const { Option } = Select;
@@ -17,7 +37,9 @@ interface Employee {
 export const AdminDashboard = () => {
   const [employees, setEmployees] = useState<Employee[]>([]);
   const [formLoading, setFormLoading] = useState(false);
-  const [selectedEmployee, setSelectedEmployee] = useState<Employee | null>(null);
+  const [selectedEmployee, setSelectedEmployee] = useState<Employee | null>(
+    null
+  );
   const employee = JSON.parse(localStorage.getItem("employee") ?? "");
   const token = localStorage.getItem("token");
   const [form] = Form.useForm();
@@ -35,7 +57,7 @@ export const AdminDashboard = () => {
       chars.charAt(Math.floor(Math.random() * chars.length))
     ).join("");
   };
-  
+
   const fetchEmployees = async () => {
     if (!employee || !token) return;
 
@@ -84,6 +106,7 @@ export const AdminDashboard = () => {
 
       message.success("Employee created successfully!");
       fetchEmployees();
+      form.resetFields();
     } catch (err: any) {
       message.error(err.message || "Something went wrong");
     } finally {
@@ -92,87 +115,111 @@ export const AdminDashboard = () => {
   };
 
   return (
- <Layout style={{ height: "98vh", backgroundColor: "white" }}>
-    <Sider
-        width={400}
+    <Layout style={{ height: "97vh", backgroundColor: "#f5f6fa" }}>
+      <Sider
+        width={340}
         style={{
-            backgroundColor: "white",
-            borderRight: "1px solid #ddd",
-            padding: "16px",
-            overflowY: "auto",
+          backgroundColor: "#fff",
+          borderRight: "1px solid #eee",
+          padding: "16px",
+          display: "flex",
+          flexDirection: "column",
+          overflowY: "auto"
         }}
-    >
-    <h2
-      style={{
-        padding:"12px",
-        fontWeight: "bold",
-        marginBottom: "16px",
-        color: "black",
-      }}
-    >
-        Employees
-    </h2>
-
-    <List
-        itemLayout="horizontal"
-        dataSource={employees}
-        renderItem={(emp) => (
-        <List.Item
+      >
+        <div style={{ flex: 1, overflowY: "auto" }}>
+          <h2
             style={{
-            cursor: "pointer",
-            padding: "12px",
-            borderBottom: "1px solid #f0f0f0",
-            backgroundColor:
-                selectedEmployee?.id === emp.id ? "#f5f5f5" : "white",
+              fontWeight: "bold",
+              marginBottom: "16px",
+              color: "black",
             }}
-            onClick={() => setSelectedEmployee(emp)}
           >
-            <List.Item.Meta
-              title={
-                  <div style={{ display: "flex", justifyContent: "space-between" }}>
-                    <span style={{ fontWeight: "bold", color: "black" }}>
-                        {emp.first_name} {emp.last_name}
-                    </span>
-                    <Tag color={roleColors[emp.role] || "default"}>{emp.role}</Tag>
-                  </div>
-              }
-              description={
-                  <div style={{ color: "black" }}>
-                    <div style={{ fontSize: "12px" }}>{emp.email}</div>
-                    {emp.is_active !== undefined && (
-                        <Tag color={emp.is_active ? "green" : "volcano"} style={{ marginTop: "4px" }}>
-                        {emp.is_active ? "Active" : "Inactive"}
-                        </Tag>
-                    )}
-                    <div>
-                      <Space key="actions">
-                        <Tooltip title="Edit">
-                          <Button type="text" icon={<EditOutlined />} />
-                        </Tooltip>
-                        <Tooltip title="Delete">
-                          <Button type="text" danger icon={<DeleteOutlined />} />
-                        </Tooltip>
-                        <Tooltip title="Chat">
-                          <Button type="text" icon={<MessageOutlined />} />
-                        </Tooltip>
-                      </Space>
-                    </div>
-                  </div>
-                }
-              />
-            </List.Item>
-        )}
-    />
-    </Sider>
+            Employees
+          </h2>
 
-      <Layout style={{ backgroundColor: "white" }}>
-        <Content style={{ padding: "24px", backgroundColor: "white" }}>
+          <List
+            itemLayout="horizontal"
+            dataSource={employees}
+            renderItem={(emp) => (
+              <List.Item
+                style={{
+                  cursor: "pointer",
+                  padding: "12px",
+                  marginBottom: "8px",
+                  borderRadius: "8px",
+                  border:
+                    selectedEmployee?.id === emp.id
+                      ? "1px solid #1677ff"
+                      : "1px solid #f0f0f0",
+                  backgroundColor:
+                    selectedEmployee?.id === emp.id ? "#e6f4ff" : "#fff",
+                }}
+                onClick={() => setSelectedEmployee(emp)}
+              >
+                <List.Item.Meta
+                  title={
+                    <div
+                      style={{
+                        display: "flex",
+                        justifyContent: "space-between",
+                        alignItems: "center",
+                      }}
+                    >
+                      <span style={{ fontWeight: 500, color: "black" }}>
+                        {emp.first_name} {emp.last_name}
+                      </span>
+                      <Tag color={roleColors[emp.role] || "default"}>
+                        {emp.role}
+                      </Tag>
+                    </div>
+                  }
+                  description={
+                    <div style={{ color: "black" }}>
+                      <div style={{ fontSize: "12px" }}>{emp.email}</div>
+                      {emp.is_active !== undefined && (
+                        <Tag
+                          color={emp.is_active ? "green" : "volcano"}
+                          style={{ marginTop: "4px" }}
+                        >
+                          {emp.is_active ? "Active" : "Inactive"}
+                        </Tag>
+                      )}
+                      <div style={{ marginTop: 8 }}>
+                        <Space>
+                          <Tooltip title="Edit">
+                            <Button type="text" icon={<EditOutlined />} />
+                          </Tooltip>
+                          <Tooltip title="Delete">
+                            <Button type="text" danger icon={<DeleteOutlined />} />
+                          </Tooltip>
+                          <Tooltip title="Chat">
+                            <Button type="text" icon={<MessageOutlined />} />
+                          </Tooltip>
+                        </Space>
+                      </div>
+                    </div>
+                  }
+                />
+              </List.Item>
+            )}
+          />
+        </div>
+      </Sider>
+
+      <Layout style={{ backgroundColor: "#f5f6fa" }}>
+        <Content style={{ padding: "24px" }}>
           <Card
             title="Create Employee"
-            bordered={true}
-            style={{ maxWidth: 600, margin: "0 auto", backgroundColor: "white" }}
+            bordered={false}
+            style={{
+              maxWidth: 600,
+              margin: "0 auto",
+              borderRadius: "12px",
+              boxShadow: "0 4px 10px rgba(0,0,0,0.05)",
+            }}
           >
-            <Form layout="vertical" onFinish={handleFinish}  form={form}>
+            <Form layout="vertical" onFinish={handleFinish} form={form}>
               <Form.Item
                 label="First Name"
                 name="first_name"
@@ -204,9 +251,9 @@ export const AdminDashboard = () => {
                 label="Password"
                 name="password"
                 rules={[{ required: true, message: "Please enter password" }]}
-                >
-                <Input.Password 
-                  placeholder="********"                   
+              >
+                <Input.Password
+                  placeholder="********"
                   addonAfter={
                     <Button
                       size="small"
@@ -233,7 +280,12 @@ export const AdminDashboard = () => {
                 </Select>
               </Form.Item>
 
-              <Button type="primary" htmlType="submit" loading={formLoading} block>
+              <Button
+                type="primary"
+                htmlType="submit"
+                loading={formLoading}
+                block
+              >
                 Create Employee
               </Button>
             </Form>
@@ -248,12 +300,17 @@ export const AdminDashboard = () => {
                 message.success(`${file.name} uploaded successfully (mock)`);
                 return false;
               }}
-              style={{width: "100%"}}
+              style={{ width: "100%" }}
             >
-              <Button 
-                type="primary"
-                icon={<UploadOutlined />} 
-                style={{ backgroundColor: "#52c41a", borderColor: "#52c41a", width: "100%" }}>
+              <Button
+                icon={<UploadOutlined />}
+                style={{
+                  backgroundColor: "#52c41a",
+                  borderColor: "#52c41a",
+                  color: "#fff",
+                  width: "100%",
+                }}
+              >
                 Import Excel Sheet
               </Button>
             </Upload>
