@@ -1,5 +1,6 @@
 import json
 from channels.generic.websocket import AsyncWebsocketConsumer
+from .domain.chat.chat_datastore import ChatDatastore
 
 
 class ChatConsumer(AsyncWebsocketConsumer):
@@ -16,9 +17,23 @@ class ChatConsumer(AsyncWebsocketConsumer):
     async def receive(self, text_data):
         data = json.loads(text_data)
         message = data.get("message")
-
+        to_user_id = data.get("to_user_id")
+        from_user_id = data.get("from_user_id")
+        print("====================")
+        print(data)
+        print(message)
+        print(from_user_id)
+        print(to_user_id)
+        print("====================")
+        chat = ChatDatastore.create_chat(from_user_id, to_user_id, message)
+        
         await self.channel_layer.group_send(
-            self.room_group_name, {"type": "chat_message", "message": message}
+            self.room_group_name, {"type": "chat_message", "message": {
+                "from_user": chat.from_user_id,
+                "to_user": chat.to_user_id,
+                "message": chat.text,
+                "created_at": str(chat.created_at)
+            }}
         )
 
     async def chat_message(self, event):
