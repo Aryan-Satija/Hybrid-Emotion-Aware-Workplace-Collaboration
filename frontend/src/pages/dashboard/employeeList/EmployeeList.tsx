@@ -11,7 +11,7 @@ import {
   Tag,
   Skeleton,
 } from "antd";
-import { PlusOutlined, UserOutlined } from "@ant-design/icons";
+import { PlusOutlined, UserOutlined, CalendarOutlined } from "@ant-design/icons";
 
 const { Sider } = Layout;
 const { Text, Title } = Typography;
@@ -96,135 +96,146 @@ export const EmployeeList: React.FC<EmployeeListProps> = ({
 
   return (
     <Sider
-    width={350}
-    style={{
+      width={350}
+      style={{
         background: "#fff",
         borderRight: "1px solid #eee",
         display: "flex",
         flexDirection: "column",
-    }}
+      }}
     >
-    {/* Company Header */}
-    <div style={{ padding: "16px", textAlign: "center" }}>
+      <div style={{ padding: "8px", textAlign: "center" }}>
         {loading ? (
-        <Skeleton.Avatar active size="large" shape="circle" />
+          <Skeleton.Avatar active size="large" shape="circle" />
         ) : (
-        <Avatar
+          <Avatar
             size={64}
             src={company?.logo_url}
             icon={<UserOutlined />}
             style={{ marginBottom: 8 }}
-        />
+          />
         )}
         <Title level={4} style={{ margin: 0 }}>
-        {company?.name || "Workspace"}
+          {company?.name || "Workspace"}
         </Title>
         <Text type="secondary" style={{ fontSize: 12 }}>
-        {company?.industry} • {company?.location}, {company?.state}
+          {company?.industry} • {company?.location}, {company?.state}
         </Text>
-    </div>
+      </div>
 
-    <Divider style={{ margin: "12px 0" }}>Your Profile</Divider>
+      <Divider style={{ margin: "12px 0" }}>Your Profile</Divider>
 
-    <div
+      <div
         style={{
-        padding: "8px 12px",
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "space-between",
-        width: "100%",
+          padding: "8px 12px",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "space-between",
+          width: "100%",
         }}
-    >
+      >
         <Avatar size="large" icon={<UserOutlined />} />
         <div
-        style={{
+          style={{
             marginLeft: 12,
             width: "100%",
             display: "flex",
             alignItems: "center",
             justifyContent: "space-between",
-        }}
+          }}
         >
-        <Text strong>
+          <Text strong>
             {employee.first_name} {employee.last_name}
-        </Text>
-        <Tag color={roleColors[employee.role] || "default"}>{employee.role}</Tag>
+          </Text>
+          <Tag color={roleColors[employee.role] || "default"}>
+            {employee.role}
+          </Tag>
         </div>
-    </div>
+      </div>
 
-    <Divider style={{ margin: "12px 0" }}>Direct Messages</Divider>
+      <Divider style={{ margin: "12px 0" }}>Direct Messages</Divider>
 
-    {/* Scrollable Employee List */}
-    <div style={{ flex: 1, overflowY: "auto", height: "300px" }}>
+      <div style={{ flex: 1, overflowY: "auto", height: "300px" }}>
         <List
-        dataSource={users}
-        loading={loading}
-        renderItem={(item) => (
+          dataSource={users}
+          loading={loading}
+          renderItem={(item) => (
             <List.Item
-            style={{
+              style={{
                 padding: "12px 12px",
                 cursor: "pointer",
                 background:
-                selectedUser?.id === item.id ? "#f5f5f5" : "transparent",
+                  selectedUser?.id === item.id ? "#f5f5f5" : "transparent",
                 borderRadius: 6,
-            }}
-            onClick={() => setSelectedUser(item)}
+              }}
+              onClick={() => setSelectedUser(item)}
             >
-            <div
+              <div
                 style={{
-                width: "100%",
-                display: "flex",
-                alignItems: "center",
-                gap: "5px",
+                  width: "100%",
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "5px",
                 }}
-            >
+              >
                 <Avatar icon={<UserOutlined />} />
                 <div
-                style={{
+                  style={{
                     display: "flex",
                     justifyContent: "space-between",
                     width: "100%",
-                }}
+                  }}
                 >
-                <span style={{ fontWeight: "bold", color: "black" }}>
+                  <span style={{ fontWeight: "bold", color: "black" }}>
                     {item.first_name} {item.last_name}
-                </span>
-                <Tag color={roleColors[item.role] || "default"}>
+                  </span>
+                  <Tag color={roleColors[item.role] || "default"}>
                     {item.role}
-                </Tag>
+                  </Tag>
                 </div>
-            </div>
+              </div>
             </List.Item>
-        )}
+          )}
         />
-    </div>
+      </div>
 
-    <div style={{ padding: "12px", borderTop: "1px solid #eee" }}>
+      <div style={{ padding: "12px", borderTop: "1px solid #eee" }}>
         {employee.role.toLowerCase() === "admin" && (
-        <Button
+          <Button
             type="dashed"
             block
             icon={<PlusOutlined />}
             style={{ marginBottom: "8px" }}
             onClick={() => {
-            navigate(`/admin/companies/${employee.company_id}/create`);
+              navigate(`/admin/companies/${employee.company_id}/create`);
             }}
-        >
+          >
             New Employee
-        </Button>
+          </Button>
         )}
         <Button
-        danger
-        block
-        onClick={() => {
+            type="dashed"
+            block
+            icon={<CalendarOutlined />}
+            style={{ marginBottom: "8px" }}
+            onClick={() => {
+              navigate(`/admin/companies/${employee.company_id}/schedule`);
+            }}
+          >
+            Calendar
+        </Button>
+        <Button
+          danger
+          block
+          onClick={() => {
             localStorage.removeItem("employee");
             localStorage.removeItem("token");
             navigate("/login");
-        }}
+          }}
         >
-        Logout
+          Logout
         </Button>
-    </div>
+      </div>
     </Sider>
   );
 };
