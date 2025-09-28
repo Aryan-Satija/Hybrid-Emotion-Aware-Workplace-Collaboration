@@ -4,7 +4,8 @@ import { Login } from './pages/login/login'
 import { Signup } from './pages/signup/signup'
 import { Dashboard } from './pages/dashboard/dashboard'
 import { CreateAdmin } from './pages/admin/admin'
-import { AdminDashboard } from './pages/adminDashboard/adminDashboard' 
+import { AdminDashboard } from './pages/adminDashboard/adminDashboard'
+import { EmployeeSchedule } from './pages/employeeSchedule/EmployeeSchedule'
 function App() {
 
   return (
@@ -20,6 +21,10 @@ function App() {
         <Route
           path="/admin/companies/:companyId/create"
           element={<AdminDashboard />}
+        />
+        <Route
+          path="/admin/companies/:companyId/schedule"
+          element={<EmployeeSchedule />}
         />
       </Routes>
     </div>

@@ -21,7 +21,7 @@ class Chat(ViewSet):
                 "from_user":chat.from_user_id,
                 "to_user": chat.to_user_id,
                 "message": chat.text,
-                "created_at": str(chat.created_at),
+                "created_at": chat.created_at.isoformat(),
             }
             for chat in chats
         ]

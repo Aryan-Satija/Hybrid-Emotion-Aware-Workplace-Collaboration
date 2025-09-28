@@ -13,6 +13,7 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 import os
 import dotenv
 import cloudinary
+from datetime import timezone
 from pathlib import Path
 from mongoengine import connect
 
@@ -155,7 +156,7 @@ CLOUDINARY_API_SECRET = os.getenv("CLOUDINARY_API_SECRET", None)
 if MONGO_URI:
     connect(MONGO_URI, alias="default")
 else:
-    connect(db="DeepVue", host="localhost", port=27017, alias="default")
+    connect(db="DeepVue", host="localhost",  tz_aware=True, tzinfo=timezone.utc, port=27017, alias="default")
 
 if CLOUDINARY_CLOUD_NAME and CLOUDINARY_API_KEY and CLOUDINARY_API_SECRET:
     cloudinary.config(

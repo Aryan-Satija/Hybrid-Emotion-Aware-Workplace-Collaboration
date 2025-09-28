@@ -45,7 +45,6 @@ export const ChatBox: React.FC<ChatBoxProps> = ({ recipient }) => {
   const [api, contextHolder] = notification.useNotification();
   const ws = useRef<WebSocket | null>(null);
   const messagesEndRef = useRef<HTMLDivElement | null>(null);
-
   function getGroupName(userId1: string, userId2: string) {
     const sortedIds = [userId1, userId2].sort();
     return `${sortedIds[0]}_${sortedIds[1]}`;

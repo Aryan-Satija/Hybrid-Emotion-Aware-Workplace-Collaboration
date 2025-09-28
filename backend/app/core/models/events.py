@@ -34,11 +34,3 @@ class Events(Document):
             self.created_at = datetime.now(timezone.utc)
         self.updated_at = datetime.now(timezone.utc)
         return super(Events, self).save(*args, **kwargs)
-
-
-class Invitation(Document):
-    event = ReferenceField("Event", reverse_delete_rule=CASCADE, required=True)
-    employee = ReferenceField("Employee", reverse_delete_rule=CASCADE, required=True)
-    status = StringField(choices=["pending", "accepted", "declined"], default="pending")
-
-    meta = {"collection": "Invitation"}
